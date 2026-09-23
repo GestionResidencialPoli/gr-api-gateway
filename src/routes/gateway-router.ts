@@ -13,22 +13,25 @@ function gatewayRouter(): Router {
   const router = Router();
 
   router.use(authenticate);
+  router.use("/api/v1/auth", authRateLimiter);
 
   serviceRegistry.forEach((service) => {
-    router.use(`${service.pathPrefix}/auth`, authRateLimiter);
+    const proxy = createServiceProxy(service);
 
-    router.use(service.pathPrefix, (req, res, next) => {
-      const path = req.originalUrl.split("?")[0] ?? req.path;
+    service.pathPrefixes.forEach((pathPrefix) => {
+      router.use(pathPrefix, (req, res, next) => {
+        const path = req.originalUrl.split("?")[0] ?? req.path;
 
-      if (isPublicPath(service, path)) {
-        next();
-        return;
-      }
+        if (isPublicPath(service, path)) {
+          next();
+          return;
+        }
 
-      requireAuthentication(req, res, next);
+        requireAuthentication(req, res, next);
+      });
+
+      router.use(pathPrefix, proxy);
     });
-
-    router.use(service.pathPrefix, createServiceProxy(service));
   });
 
   return router;

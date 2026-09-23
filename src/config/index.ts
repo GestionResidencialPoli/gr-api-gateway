@@ -33,6 +33,7 @@ const config = {
   accessTokenCookieName: process.env.ACCESS_TOKEN_COOKIE_NAME ?? "access_token",
   corsAllowedOrigins: requiredList("CORS_ALLOWED_ORIGINS", "http://localhost:3000"),
   userServiceUrl: process.env.USER_SERVICE_URL ?? "http://localhost:8080",
+  wallServiceUrl: process.env.WALL_SERVICE_URL ?? "http://localhost:4100",
   rateLimit: {
     windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS ?? 60_000),
     max: Number(process.env.RATE_LIMIT_MAX ?? 300),
