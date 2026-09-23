@@ -6,6 +6,7 @@ function createServiceProxy(service: ServiceRoute) {
   return createProxyMiddleware({
     target: service.target,
     changeOrigin: true,
+    pathFilter: service.pathPrefixes,
     on: {
       error: (error, _req, res) => {
         Logger.error(error as Error, { service: service.name });
