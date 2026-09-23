@@ -33,6 +33,9 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      - name: Pruebas unitarias
+        run: pnpm test
+
       - name: Build
         run: pnpm build
 
@@ -55,13 +58,17 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Levantar Redis para la prueba
+        run: docker run -d --name redis-smoke -p 6379:6379 redis:7-alpine
+
       - name: Arrancar el contenedor y validar /health
         env:
           CI_JWT_SECRET: ${{ secrets.CI_JWT_SECRET }}
         run: |
           docker run -d --name app-smoke \
-            -p 4000:4000 \
+            --network host \
             -e JWT_SECRET="$CI_JWT_SECRET" \
+            -e REDIS_URL=redis://localhost:6379 \
             -e USER_SERVICE_URL=http://localhost:8080 \
             -e WALL_SERVICE_URL=http://localhost:4100 \
             gr-api-gateway:ci

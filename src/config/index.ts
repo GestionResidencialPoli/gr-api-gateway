@@ -42,6 +42,9 @@ const config = {
     windowMs: Number(process.env.AUTH_RATE_LIMIT_WINDOW_MS ?? 60_000),
     max: Number(process.env.AUTH_RATE_LIMIT_MAX ?? 10),
   },
+  redis: {
+    url: process.env.REDIS_URL ?? "redis://localhost:6379",
+  },
 } as const;
 
 export default config;
