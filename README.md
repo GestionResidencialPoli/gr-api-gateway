@@ -61,3 +61,4 @@ pnpm dev
 - `pnpm build` / `pnpm start` — build y ejecucion de produccion
 - `pnpm lint` / `pnpm lint:fix`
 - `pnpm typecheck`
+
