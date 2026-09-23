@@ -56,10 +56,12 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Arrancar el contenedor y validar /health
+        env:
+          CI_JWT_SECRET: ${{ secrets.CI_JWT_SECRET }}
         run: |
           docker run -d --name app-smoke \
             -p 4000:4000 \
-            -e JWT_SECRET=ci-secreto-de-al-menos-32-caracteres-para-pruebas \
+            -e JWT_SECRET="$CI_JWT_SECRET" \
             -e USER_SERVICE_URL=http://localhost:8080 \
             -e WALL_SERVICE_URL=http://localhost:4100 \
             gr-api-gateway:ci
