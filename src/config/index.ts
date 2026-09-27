@@ -34,6 +34,8 @@ const config = {
   corsAllowedOrigins: requiredList("CORS_ALLOWED_ORIGINS", "http://localhost:3000"),
   userServiceUrl: process.env.USER_SERVICE_URL ?? "http://localhost:8080",
   wallServiceUrl: process.env.WALL_SERVICE_URL ?? "http://localhost:4100",
+  bookingServiceUrl: process.env.BOOKING_SERVICE_URL ?? "http://localhost:4200",
+  gateServiceUrl: process.env.GATE_SERVICE_URL ?? "http://localhost:4300",
   rateLimit: {
     windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS ?? 60_000),
     max: Number(process.env.RATE_LIMIT_MAX ?? 300),

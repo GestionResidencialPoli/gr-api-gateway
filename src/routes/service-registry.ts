@@ -28,6 +28,18 @@ const serviceRegistry: ServiceRoute[] = [
     target: config.wallServiceUrl,
     publicPaths: [],
   },
+  {
+    name: "booking-microservice",
+    pathPrefixes: ["/api/v1/zonas-comunes", "/api/v1/reservas"],
+    target: config.bookingServiceUrl,
+    publicPaths: [],
+  },
+  {
+    name: "gate-microservice",
+    pathPrefixes: ["/api/v1/porteria"],
+    target: config.gateServiceUrl,
+    publicPaths: [],
+  },
 ];
 
 export default serviceRegistry;

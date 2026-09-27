@@ -45,6 +45,18 @@ Se agrega una entrada en `src/routes/service-registry.ts` con su `pathPrefix`, s
 publicas que no requieren autenticacion. El router del gateway monta rate limiting, verificacion de auth y el
 proxy automaticamente para cada entrada del registro.
 
+Servicios registrados hoy:
+
+| Servicio | Prefijos | Variable del destino | Puerto local |
+|---|---|---|---|
+| gr-user-microservice | `/api/v1/auth`, `/api/v1/apartamentos`, `/api/v1/vigilantes` | `USER_SERVICE_URL` | 8080 |
+| gr-wall-microservice | `/api/v1/publicaciones` | `WALL_SERVICE_URL` | 4100 |
+| gr-booking-microservice | `/api/v1/zonas-comunes`, `/api/v1/reservas` | `BOOKING_SERVICE_URL` | 4200 |
+| gr-gate-microservice | `/api/v1/porteria` | `GATE_SERVICE_URL` | 4300 |
+
+`docker compose up` levanta el stack completo, incluidas las migraciones de cada servicio Node, que crean su propia
+base (`gr_wall_db`, `gr_booking_db`, `gr_gate_db`) en el mismo Postgres.
+
 ## Variables de entorno
 
 Ver `.env.example`. `JWT_SECRET` debe ser exactamente el mismo secreto configurado en `gr-user-microservice`
