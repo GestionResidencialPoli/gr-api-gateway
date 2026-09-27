@@ -19,7 +19,7 @@ const serviceRegistry: ServiceRoute[] = [
       "/api/v1/auth/logout",
       "/api/v1/auth/password-reset",
       "/api/v1/auth/password-reset/confirm",
-      "/api/v1/auth/admin-sso/exchange",
+      "/api/v1/auth/sso/exchange",
     ],
   },
   {
