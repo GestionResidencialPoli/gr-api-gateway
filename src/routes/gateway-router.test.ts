@@ -32,6 +32,16 @@ describe("gatewayRouter", () => {
     expect(res.status).toBe(200);
   });
 
+  it("deja pasar el canje SSO sin cookie de sesion: la app destino todavia no tiene una", async () => {
+    const res = await request(buildApp()).post("/api/v1/auth/sso/exchange");
+    expect(res.status).toBe(200);
+  });
+
+  it("exige sesion para emitir un codigo SSO", async () => {
+    const res = await request(buildApp()).post("/api/v1/auth/sso/code");
+    expect(res.status).toBe(401);
+  });
+
   it("rechaza una ruta protegida sin autenticacion", async () => {
     const res = await request(buildApp()).get("/api/v1/apartamentos");
     expect(res.status).toBe(401);
