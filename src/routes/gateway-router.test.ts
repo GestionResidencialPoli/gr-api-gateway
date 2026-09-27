@@ -10,7 +10,16 @@ vi.mock("../middlewares/rate-limiter", () => ({
 }));
 
 vi.mock("../proxies/create-service-proxy", () => ({
-  default: () => (req: express.Request, res: express.Response) => res.status(200).json({ proxied: true, path: req.originalUrl }),
+  default:
+    (service: { name: string; pathPrefixes: string[] }) =>
+    (req: express.Request, res: express.Response, next: express.NextFunction) => {
+      const path = req.originalUrl.split("?")[0] ?? "";
+      if (!service.pathPrefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`))) {
+        next();
+        return;
+      }
+      res.status(200).json({ proxied: true, path: req.originalUrl, service: service.name });
+    },
 }));
 
 import gatewayRouter from "./gateway-router";
@@ -64,5 +73,22 @@ describe("gatewayRouter", () => {
 
     expect(res.status).toBe(200);
     expect(res.body.path).toBe("/api/v1/publicaciones/42");
+  });
+
+  it.each([
+    ["/api/v1/zonas-comunes/3/disponibilidad?desde=2026-10-01", "booking-microservice"],
+    ["/api/v1/reservas/mias", "booking-microservice"],
+    ["/api/v1/porteria/visitas/abiertas", "gate-microservice"],
+    ["/api/v1/porteria/eventos", "gate-microservice"],
+  ])("enruta %s a %s conservando la ruta completa", async (ruta, servicio) => {
+    const res = await request(buildApp()).get(ruta).set("Cookie", `access_token=${signToken()}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ service: servicio, path: ruta });
+  });
+
+  it("exige sesion para reservas y porteria", async () => {
+    expect((await request(buildApp()).get("/api/v1/reservas/mias")).status).toBe(401);
+    expect((await request(buildApp()).get("/api/v1/porteria/aforo")).status).toBe(401);
   });
 });
