@@ -250,7 +250,10 @@ services:
         condition: service_healthy
 
   public-ui:
-    build: ../gr-public-ui
+    build:
+      context: ../gr-public-ui
+      args:
+        BACKEND_API_URL: http://gateway:4000
     environment:
       BACKEND_API_URL: http://gateway:4000
     ports:
@@ -260,7 +263,10 @@ services:
         condition: service_healthy
 
   billing-ui:
-    build: ../gr-billing-ui
+    build:
+      context: ../gr-billing-ui
+      args:
+        BACKEND_API_URL: http://gateway:4000
     environment:
       BACKEND_API_URL: http://gateway:4000
     ports:
