@@ -3,10 +3,12 @@
 API Gateway para los microservicios de Gestion Residencial (GR). Se ubica delante de `gr-user-microservice`
 (y de los servicios que se agreguen despues) y resuelve dos cosas antes de que la peticion llegue al backend:
 
-- **Rate limiting** por IP, con un limite mas estricto para `/api/v1/auth/*`. El contador se guarda en Redis
-  (compartido entre replicas del gateway; un contador en memoria por proceso no serviria de limite real si k3s
-  levanta mas de un pod por trafico) y cae automaticamente a un contador en memoria del propio proceso si Redis
-  no responde, para que Redis no se convierta en un punto unico de falla del gateway.
+- **Rate limiting** por IP, con un limite mas estricto para las operaciones sensibles de `/api/v1/auth/*`
+  (login, cambio y recuperacion de contrasena). Las comprobaciones de sesion, refresh, logout y SSO no consumen
+  ese contador: son parte del flujo normal de navegacion entre frontends y ya requieren una sesion o un codigo
+  valido. El contador se guarda en Redis (compartido entre replicas del gateway; un contador en memoria por
+  proceso no serviria de limite real si k3s levanta mas de un pod por trafico) y cae automaticamente a un contador
+  en memoria del propio proceso si Redis no responde, para que Redis no se convierta en un punto unico de falla.
 - **Validacion local de JWT**: lee la cookie `access_token`, verifica la firma HMAC-SHA256 con el mismo
   secreto que usa `gr-user-microservice` y rechaza tokens invalidos o expirados sin llamar al microservicio.
 
@@ -58,6 +60,8 @@ Servicios registrados hoy:
 base (`gr_wall_db`, `gr_booking_db`, `gr_gate_db`) en el mismo Postgres.
 
 ## Variables de entorno
+
+`CONTACT_SERVICE_URL` (por defecto `http://localhost:4500`) y `BILLING_SERVICE_URL` (por defecto `http://localhost:4400`) apuntan a los servicios nuevos. El gateway permite anónimamente únicamente `POST /api/v1/contacto/solicitudes`; las demás rutas de contacto y todas las financieras requieren sesión.
 
 Ver `.env.example`. `JWT_SECRET` debe ser exactamente el mismo secreto configurado en `gr-user-microservice`
 (variable `JWT_SECRET` alla tambien), de al menos 32 caracteres.

@@ -7,6 +7,7 @@ import config from "../config";
 
 vi.mock("../middlewares/rate-limiter", () => ({
   authRateLimiter: (_req: unknown, _res: unknown, next: () => void) => next(),
+  contactRateLimiter: (_req: unknown, _res: unknown, next: () => void) => next(),
 }));
 
 vi.mock("../proxies/create-service-proxy", () => ({
@@ -67,9 +68,7 @@ describe("gatewayRouter", () => {
   });
 
   it("enruta al servicio del muro conservando el path completo (sin el bug de path-stripping)", async () => {
-    const res = await request(buildApp())
-      .get("/api/v1/publicaciones/42")
-      .set("Cookie", `access_token=${signToken()}`);
+    const res = await request(buildApp()).get("/api/v1/publicaciones/42").set("Cookie", `access_token=${signToken()}`);
 
     expect(res.status).toBe(200);
     expect(res.body.path).toBe("/api/v1/publicaciones/42");
@@ -90,5 +89,22 @@ describe("gatewayRouter", () => {
   it("exige sesion para reservas y porteria", async () => {
     expect((await request(buildApp()).get("/api/v1/reservas/mias")).status).toBe(401);
     expect((await request(buildApp()).get("/api/v1/porteria/aforo")).status).toBe(401);
+  });
+
+  it("permite solo POST en la ruta pública exacta de contacto", async () => {
+    expect((await request(buildApp()).post("/api/v1/contacto/solicitudes")).status).toBe(200);
+    expect((await request(buildApp()).post("/api/v1/contacto/solicitudes?origen=web")).status).toBe(200);
+    expect((await request(buildApp()).get("/api/v1/contacto/solicitudes")).status).toBe(401);
+    expect((await request(buildApp()).post("/api/v1/contacto/solicitudes/")).status).toBe(401);
+    expect((await request(buildApp()).post("/api/v1/contacto/solicitudes/1")).status).toBe(401);
+  });
+
+  it("protege toda la ruta financiera y conserva el path", async () => {
+    expect((await request(buildApp()).get("/api/v1/finanzas/cartera")).status).toBe(401);
+    const res = await request(buildApp())
+      .post("/api/v1/finanzas/graphql")
+      .set("Cookie", `access_token=${signToken(["ADMINISTRACION"])}`);
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ service: "billing-microservice", path: "/api/v1/finanzas/graphql" });
   });
 });
