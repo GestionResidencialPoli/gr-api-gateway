@@ -1,7 +1,7 @@
 import { Router, type Request, type NextFunction, type Response } from "express";
 import authenticate from "../middlewares/authenticate";
 import requireAuthentication from "../middlewares/require-authentication";
-import { authRateLimiter } from "../middlewares/rate-limiter";
+import { authRateLimiter, contactRateLimiter } from "../middlewares/rate-limiter";
 import createServiceProxy from "../proxies/create-service-proxy";
 import serviceRegistry, { type ServiceRoute } from "./service-registry";
 
@@ -9,8 +9,13 @@ function matchesService(service: ServiceRoute, path: string): boolean {
   return service.pathPrefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
 }
 
-function isPublicPath(service: ServiceRoute, path: string): boolean {
-  return service.publicPaths.some((publicPath) => path === publicPath || path.startsWith(`${publicPath}/`));
+function isPublicPath(service: ServiceRoute, path: string, method: string): boolean {
+  return service.publicPaths.some((publicPath) => {
+    if (typeof publicPath === "string") {
+      return path === publicPath || path.startsWith(`${publicPath}/`);
+    }
+    return publicPath.method === method && path === publicPath.path;
+  });
 }
 
 const AUTH_THROTTLED_PATHS = [
@@ -34,7 +39,10 @@ function gatewayRouter(): Router {
       authRateLimiter(req, res, next);
       return;
     }
-
+    if (req.method === "POST" && req.originalUrl.split("?")[0] === "/api/v1/contacto/solicitudes") {
+      contactRateLimiter(req, res, next);
+      return;
+    }
     next();
   });
 
@@ -42,7 +50,7 @@ function gatewayRouter(): Router {
     router.use((req: Request, res: Response, next: NextFunction) => {
       const path = req.originalUrl.split("?")[0] ?? req.path;
 
-      if (!matchesService(service, path) || isPublicPath(service, path)) {
+      if (!matchesService(service, path) || isPublicPath(service, path, req.method)) {
         next();
         return;
       }

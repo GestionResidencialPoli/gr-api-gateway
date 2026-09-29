@@ -1,1 +1,2 @@
-CREATE DATABASE gr_wall_db;
+-- Las bases se crean en db-bootstrap para que el stack también funcione con
+-- un volumen existente. Este archivo se conserva por compatibilidad histórica.
