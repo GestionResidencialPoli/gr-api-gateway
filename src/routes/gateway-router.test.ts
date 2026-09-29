@@ -68,9 +68,7 @@ describe("gatewayRouter", () => {
   });
 
   it("enruta al servicio del muro conservando el path completo (sin el bug de path-stripping)", async () => {
-    const res = await request(buildApp())
-      .get("/api/v1/publicaciones/42")
-      .set("Cookie", `access_token=${signToken()}`);
+    const res = await request(buildApp()).get("/api/v1/publicaciones/42").set("Cookie", `access_token=${signToken()}`);
 
     expect(res.status).toBe(200);
     expect(res.body.path).toBe("/api/v1/publicaciones/42");
@@ -103,7 +101,9 @@ describe("gatewayRouter", () => {
 
   it("protege toda la ruta financiera y conserva el path", async () => {
     expect((await request(buildApp()).get("/api/v1/finanzas/cartera")).status).toBe(401);
-    const res = await request(buildApp()).post("/api/v1/finanzas/graphql").set("Cookie", `access_token=${signToken(["ADMINISTRACION"])}`);
+    const res = await request(buildApp())
+      .post("/api/v1/finanzas/graphql")
+      .set("Cookie", `access_token=${signToken(["ADMINISTRACION"])}`);
     expect(res.status).toBe(200);
     expect(res.body).toMatchObject({ service: "billing-microservice", path: "/api/v1/finanzas/graphql" });
   });
