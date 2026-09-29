@@ -19,7 +19,7 @@ class HybridRateLimitStore implements Store {
     this.redisStore = new RedisStore({
       sendCommand: (...args: string[]) => {
         const [command, ...rest] = args;
-        return redis.call(command as string, rest) as Promise<RedisReply>;
+        return redis.call(command as string, ...rest) as Promise<RedisReply>;
       },
       prefix,
     });

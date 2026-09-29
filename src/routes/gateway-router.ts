@@ -1,7 +1,7 @@
 import { Router, type Request, type NextFunction, type Response } from "express";
 import authenticate from "../middlewares/authenticate";
 import requireAuthentication from "../middlewares/require-authentication";
-import { authRateLimiter } from "../middlewares/rate-limiter";
+import { authRateLimiter, contactRateLimiter } from "../middlewares/rate-limiter";
 import createServiceProxy from "../proxies/create-service-proxy";
 import serviceRegistry, { type ServiceRoute } from "./service-registry";
 
@@ -39,7 +39,10 @@ function gatewayRouter(): Router {
       authRateLimiter(req, res, next);
       return;
     }
-
+    if (req.method === "POST" && req.originalUrl.split("?")[0] === "/api/v1/contacto/solicitudes") {
+      contactRateLimiter(req, res, next);
+      return;
+    }
     next();
   });
 

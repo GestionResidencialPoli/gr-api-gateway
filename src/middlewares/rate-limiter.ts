@@ -41,3 +41,12 @@ export const authRateLimiter = rateLimit({
   store: new HybridRateLimitStore("rl:auth:"),
   skip: shouldSkipAuthRateLimit,
 });
+
+export const contactRateLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: { code: "CONTACTO_LIMITE", message: "Demasiadas solicitudes de contacto. Intenta más tarde." } },
+  store: new HybridRateLimitStore("rl:contact:"),
+});

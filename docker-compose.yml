@@ -132,6 +132,9 @@ services:
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:3006,http://localhost:3007}
       PORT: 4400
       INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:?falta INTERNAL_SERVICE_TOKEN en .env}
+      USER_SERVICE_URL: http://user-microservice:8080
+      RABBITMQ_URL: amqp://rabbitmq:5672
+      BILLING_EVENTS_EXCHANGE: gr.finance.events
     ports:
       - "4400:4400"
     depends_on:

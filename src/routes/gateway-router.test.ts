@@ -7,6 +7,7 @@ import config from "../config";
 
 vi.mock("../middlewares/rate-limiter", () => ({
   authRateLimiter: (_req: unknown, _res: unknown, next: () => void) => next(),
+  contactRateLimiter: (_req: unknown, _res: unknown, next: () => void) => next(),
 }));
 
 vi.mock("../proxies/create-service-proxy", () => ({
@@ -94,7 +95,9 @@ describe("gatewayRouter", () => {
 
   it("permite solo POST en la ruta pública exacta de contacto", async () => {
     expect((await request(buildApp()).post("/api/v1/contacto/solicitudes")).status).toBe(200);
+    expect((await request(buildApp()).post("/api/v1/contacto/solicitudes?origen=web")).status).toBe(200);
     expect((await request(buildApp()).get("/api/v1/contacto/solicitudes")).status).toBe(401);
+    expect((await request(buildApp()).post("/api/v1/contacto/solicitudes/")).status).toBe(401);
     expect((await request(buildApp()).post("/api/v1/contacto/solicitudes/1")).status).toBe(401);
   });
 
