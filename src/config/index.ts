@@ -36,6 +36,8 @@ const config = {
   wallServiceUrl: process.env.WALL_SERVICE_URL ?? "http://localhost:4100",
   bookingServiceUrl: process.env.BOOKING_SERVICE_URL ?? "http://localhost:4200",
   gateServiceUrl: process.env.GATE_SERVICE_URL ?? "http://localhost:4300",
+  contactServiceUrl: process.env.CONTACT_SERVICE_URL ?? "http://localhost:4500",
+  billingServiceUrl: process.env.BILLING_SERVICE_URL ?? "http://localhost:4400",
   rateLimit: {
     windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS ?? 60_000),
     max: Number(process.env.RATE_LIMIT_MAX ?? 300),

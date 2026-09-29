@@ -59,6 +59,8 @@ base (`gr_wall_db`, `gr_booking_db`, `gr_gate_db`) en el mismo Postgres.
 
 ## Variables de entorno
 
+`CONTACT_SERVICE_URL` (por defecto `http://localhost:4500`) y `BILLING_SERVICE_URL` (por defecto `http://localhost:4400`) apuntan a los servicios nuevos. El gateway permite anónimamente únicamente `POST /api/v1/contacto/solicitudes`; las demás rutas de contacto y todas las financieras requieren sesión.
+
 Ver `.env.example`. `JWT_SECRET` debe ser exactamente el mismo secreto configurado en `gr-user-microservice`
 (variable `JWT_SECRET` alla tambien), de al menos 32 caracteres.
 

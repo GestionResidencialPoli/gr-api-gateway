@@ -4,7 +4,7 @@ export interface ServiceRoute {
   name: string;
   pathPrefixes: string[];
   target: string;
-  publicPaths: string[];
+  publicPaths: Array<string | { method: string; path: string }>;
 }
 
 const serviceRegistry: ServiceRoute[] = [
@@ -38,6 +38,18 @@ const serviceRegistry: ServiceRoute[] = [
     name: "gate-microservice",
     pathPrefixes: ["/api/v1/porteria"],
     target: config.gateServiceUrl,
+    publicPaths: [],
+  },
+  {
+    name: "contact-microservice",
+    pathPrefixes: ["/api/v1/contacto"],
+    target: config.contactServiceUrl,
+    publicPaths: [{ method: "POST", path: "/api/v1/contacto/solicitudes" }],
+  },
+  {
+    name: "billing-microservice",
+    pathPrefixes: ["/api/v1/finanzas"],
+    target: config.billingServiceUrl,
     publicPaths: [],
   },
 ];
