@@ -18,11 +18,30 @@ function isPublicPath(service: ServiceRoute, path: string, method: string): bool
   });
 }
 
+const AUTH_THROTTLED_PATHS = [
+  "/api/v1/auth/login",
+  "/api/v1/auth/password-reset",
+  "/api/v1/auth/password-reset/confirm",
+];
+
+function isAuthThrottledPath(path: string): boolean {
+  return AUTH_THROTTLED_PATHS.some((authPath) => path === authPath || path.startsWith(`${authPath}/`));
+}
+
 function gatewayRouter(): Router {
   const router = Router();
 
   router.use(authenticate);
-  router.use("/api/v1/auth", authRateLimiter);
+  router.use((req: Request, res: Response, next: NextFunction) => {
+    const path = req.originalUrl.split("?")[0] ?? req.path;
+
+    if (req.method === "POST" && isAuthThrottledPath(path)) {
+      authRateLimiter(req, res, next);
+      return;
+    }
+
+    next();
+  });
 
   serviceRegistry.forEach((service) => {
     router.use((req: Request, res: Response, next: NextFunction) => {
