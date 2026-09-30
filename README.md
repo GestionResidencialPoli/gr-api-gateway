@@ -59,6 +59,31 @@ Servicios registrados hoy:
 `docker compose up` levanta el stack completo, incluidas las migraciones de cada servicio Node, que crean su propia
 base (`gr_wall_db`, `gr_booking_db`, `gr_gate_db`) en el mismo Postgres.
 
+## Entorno local completo con Docker Compose
+
+Desde la raíz de este repositorio, el comando siguiente construye y levanta las bases de datos, los microservicios,
+el gateway y todas las interfaces disponibles:
+
+```powershell
+docker compose up -d --build
+```
+
+Interfaces publicadas en local:
+
+| Interfaz | Puerto |
+|---|---:|
+| `gr-common-ui` | 3000 |
+| `gr-admin-ui` | 3001 |
+| `gr-auth-ui` | 3002 |
+| `gr-wall-ui` | 3003 |
+| `gr-booking-ui` | 3004 |
+| `gr-gate-ui` | 3005 |
+| `gr-public-ui` | 3006 |
+| `gr-billing-ui` | 3007 |
+
+Las URLs de los frontends se resuelven desde el navegador mediante `localhost`; dentro de los contenedores, las
+peticiones al backend usan el nombre del servicio `gateway` en la red de Compose.
+
 ## Variables de entorno
 
 `CONTACT_SERVICE_URL` (por defecto `http://localhost:4500`) y `BILLING_SERVICE_URL` (por defecto `http://localhost:4400`) apuntan a los servicios nuevos. El gateway permite anónimamente únicamente `POST /api/v1/contacto/solicitudes`; las demás rutas de contacto y todas las financieras requieren sesión.
