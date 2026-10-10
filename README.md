@@ -56,16 +56,16 @@ Servicios registrados hoy:
 | gr-booking-microservice | `/api/v1/zonas-comunes`, `/api/v1/reservas` | `BOOKING_SERVICE_URL` | 4200 |
 | gr-gate-microservice | `/api/v1/porteria` | `GATE_SERVICE_URL` | 4300 |
 
-`docker compose up` levanta el stack completo, incluidas las migraciones de cada servicio Node, que crean su propia
-base (`gr_wall_db`, `gr_booking_db`, `gr_gate_db`) en el mismo Postgres.
+El stack completo (incluidas las migraciones de cada servicio Node, que crean su propia base — `gr_wall_db`,
+`gr_booking_db`, `gr_gate_db` — en el mismo Postgres) se levanta desde `gr-infra`, no desde este repo.
 
 ## Entorno local completo con Docker Compose
 
-Desde la raíz de este repositorio, el comando siguiente construye y levanta las bases de datos, los microservicios,
-el gateway y todas las interfaces disponibles:
+El compose de desarrollo vive en `gr-infra/docker-compose.local.yml` (construye este repo y todos los demás como
+repos hermanos). Desde `gr-infra/`:
 
-```powershell
-docker compose up -d --build
+```bash
+docker compose -f docker-compose.local.yml up -d --build
 ```
 
 Interfaces publicadas en local:
