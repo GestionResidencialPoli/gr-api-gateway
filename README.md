@@ -3,7 +3,12 @@
 API Gateway para los microservicios de Gestion Residencial (GR). Se ubica delante de `gr-user-microservice`
 (y de los servicios que se agreguen despues) y resuelve dos cosas antes de que la peticion llegue al backend:
 
-- **Rate limiting** por IP, con un limite mas estricto para `/api/v1/auth/*`.
+- **Rate limiting** por IP, con un limite mas estricto para las operaciones sensibles de `/api/v1/auth/*`
+  (login, cambio y recuperacion de contrasena). Las comprobaciones de sesion, refresh, logout y SSO no consumen
+  ese contador: son parte del flujo normal de navegacion entre frontends y ya requieren una sesion o un codigo
+  valido. El contador se guarda en Redis (compartido entre replicas del gateway; un contador en memoria por
+  proceso no serviria de limite real si k3s levanta mas de un pod por trafico) y cae automaticamente a un contador
+  en memoria del propio proceso si Redis no responde, para que Redis no se convierta en un punto unico de falla.
 - **Validacion local de JWT**: lee la cookie `access_token`, verifica la firma HMAC-SHA256 con el mismo
   secreto que usa `gr-user-microservice` y rechaza tokens invalidos o expirados sin llamar al microservicio.
 
@@ -42,7 +47,46 @@ Se agrega una entrada en `src/routes/service-registry.ts` con su `pathPrefix`, s
 publicas que no requieren autenticacion. El router del gateway monta rate limiting, verificacion de auth y el
 proxy automaticamente para cada entrada del registro.
 
+Servicios registrados hoy:
+
+| Servicio | Prefijos | Variable del destino | Puerto local |
+|---|---|---|---|
+| gr-user-microservice | `/api/v1/auth`, `/api/v1/apartamentos`, `/api/v1/vigilantes` | `USER_SERVICE_URL` | 8080 |
+| gr-wall-microservice | `/api/v1/publicaciones` | `WALL_SERVICE_URL` | 4100 |
+| gr-booking-microservice | `/api/v1/zonas-comunes`, `/api/v1/reservas` | `BOOKING_SERVICE_URL` | 4200 |
+| gr-gate-microservice | `/api/v1/porteria` | `GATE_SERVICE_URL` | 4300 |
+
+El stack completo (incluidas las migraciones de cada servicio Node, que crean su propia base — `gr_wall_db`,
+`gr_booking_db`, `gr_gate_db` — en el mismo Postgres) se levanta desde `gr-infra`, no desde este repo.
+
+## Entorno local completo con Docker Compose
+
+El compose de desarrollo vive en `gr-infra/docker-compose.local.yml` (construye este repo y todos los demás como
+repos hermanos). Desde `gr-infra/`:
+
+```bash
+docker compose -f docker-compose.local.yml up -d --build
+```
+
+Interfaces publicadas en local:
+
+| Interfaz | Puerto |
+|---|---:|
+| `gr-common-ui` | 3000 |
+| `gr-admin-ui` | 3001 |
+| `gr-auth-ui` | 3002 |
+| `gr-wall-ui` | 3003 |
+| `gr-booking-ui` | 3004 |
+| `gr-gate-ui` | 3005 |
+| `gr-public-ui` | 3006 |
+| `gr-billing-ui` | 3007 |
+
+Las URLs de los frontends se resuelven desde el navegador mediante `localhost`; dentro de los contenedores, las
+peticiones al backend usan el nombre del servicio `gateway` en la red de Compose.
+
 ## Variables de entorno
+
+`CONTACT_SERVICE_URL` (por defecto `http://localhost:4500`) y `BILLING_SERVICE_URL` (por defecto `http://localhost:4400`) apuntan a los servicios nuevos. El gateway permite anónimamente únicamente `POST /api/v1/contacto/solicitudes`; las demás rutas de contacto y todas las financieras requieren sesión.
 
 Ver `.env.example`. `JWT_SECRET` debe ser exactamente el mismo secreto configurado en `gr-user-microservice`
 (variable `JWT_SECRET` alla tambien), de al menos 32 caracteres.
@@ -61,3 +105,4 @@ pnpm dev
 - `pnpm build` / `pnpm start` — build y ejecucion de produccion
 - `pnpm lint` / `pnpm lint:fix`
 - `pnpm typecheck`
+
