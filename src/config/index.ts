@@ -33,6 +33,11 @@ const config = {
   accessTokenCookieName: process.env.ACCESS_TOKEN_COOKIE_NAME ?? "access_token",
   corsAllowedOrigins: requiredList("CORS_ALLOWED_ORIGINS", "http://localhost:3000"),
   userServiceUrl: process.env.USER_SERVICE_URL ?? "http://localhost:8080",
+  wallServiceUrl: process.env.WALL_SERVICE_URL ?? "http://localhost:4100",
+  bookingServiceUrl: process.env.BOOKING_SERVICE_URL ?? "http://localhost:4200",
+  gateServiceUrl: process.env.GATE_SERVICE_URL ?? "http://localhost:4300",
+  contactServiceUrl: process.env.CONTACT_SERVICE_URL ?? "http://localhost:4500",
+  billingServiceUrl: process.env.BILLING_SERVICE_URL ?? "http://localhost:4400",
   rateLimit: {
     windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS ?? 60_000),
     max: Number(process.env.RATE_LIMIT_MAX ?? 300),
@@ -40,6 +45,9 @@ const config = {
   authRateLimit: {
     windowMs: Number(process.env.AUTH_RATE_LIMIT_WINDOW_MS ?? 60_000),
     max: Number(process.env.AUTH_RATE_LIMIT_MAX ?? 10),
+  },
+  redis: {
+    url: process.env.REDIS_URL ?? "redis://localhost:6379",
   },
 } as const;
 
