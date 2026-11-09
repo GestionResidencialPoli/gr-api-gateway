@@ -22,7 +22,7 @@ no reemplaza esa validacion.
 - Node 24, TypeScript, Express 5
 - pnpm
 - `tsx` para desarrollo, `tsc` para build de produccion
-- `http-proxy-middleware` para el reverse proxy hacia cada microservicio
+- `http-proxy-middleware` para el reverse proxy HTTP y WebSocket hacia cada microservicio
 
 ## Estructura
 
@@ -82,7 +82,8 @@ Interfaces publicadas en local:
 | `gr-billing-ui` | 3007 |
 
 Las URLs de los frontends se resuelven desde el navegador mediante `localhost`; dentro de los contenedores, las
-peticiones al backend usan el nombre del servicio `gateway` en la red de Compose.
+peticiones al backend usan el nombre del servicio `gateway` en la red de Compose. El gateway también reenvía el
+upgrade WebSocket de `/api/v1/publicaciones/eventos/ws` hacia `gr-wall-microservice`.
 
 ## Variables de entorno
 

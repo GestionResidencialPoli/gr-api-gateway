@@ -8,6 +8,8 @@ import config from "./config";
 import gatewayRouter from "./routes/gateway-router";
 import { globalRateLimiter } from "./middlewares/rate-limiter";
 import handleError from "./middlewares/handle-error";
+import serviceRegistry from "./routes/service-registry";
+import { attachWebSocketProxy } from "./proxies/create-service-proxy";
 
 class Server {
   public app: Application;
@@ -18,6 +20,10 @@ class Server {
     this.app = express();
     this.httpServer = http.createServer(this.app);
     this.setup();
+    const wallService = serviceRegistry.find((service) => service.name === "wall-microservice");
+    if (wallService) {
+      attachWebSocketProxy(this.httpServer, wallService, "/api/v1/publicaciones/eventos/ws");
+    }
   }
 
   private setup(): void {
