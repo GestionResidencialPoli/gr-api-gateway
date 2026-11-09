@@ -1,4 +1,6 @@
 import { createProxyMiddleware } from "http-proxy-middleware";
+import type { IncomingMessage, Server as HttpServer } from "http";
+import type { Socket } from "net";
 import type { ServiceRoute } from "../routes/service-registry";
 import Logger from "../lib/logger";
 
@@ -8,10 +10,11 @@ function splitSetCookieHeaders(setCookies: string | string[]): string[] {
   return headers.flatMap((header) => header.split(/,\s*(?=[^;,\s=]+=[^;,]+)/));
 }
 
-function createServiceProxy(service: ServiceRoute) {
+function createServiceProxy(service: ServiceRoute, ws = false) {
   return createProxyMiddleware({
     target: service.target,
     changeOrigin: true,
+    ws,
     pathFilter: service.pathPrefixes,
     on: {
       proxyRes: (proxyRes) => {
@@ -30,6 +33,16 @@ function createServiceProxy(service: ServiceRoute) {
         }
       },
     },
+  });
+}
+
+export function attachWebSocketProxy(server: HttpServer, service: ServiceRoute, path: string): void {
+  const proxy = createServiceProxy(service, true);
+
+  server.on("upgrade", (req: IncomingMessage, socket: Socket, head: Buffer) => {
+    const requestPath = new URL(req.url ?? "/", "http://localhost").pathname;
+    if (requestPath !== path) return;
+    proxy.upgrade(req, socket, head);
   });
 }
 
