@@ -3,6 +3,7 @@ import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import config from "../config";
 import authenticate from "./authenticate";
+import { encryptNestedJwt } from "../lib/jwe";
 
 function mockRequest(cookies: Record<string, string> = {}): Request {
   return { cookies } as unknown as Request;
@@ -30,7 +31,10 @@ describe("authenticate", () => {
   });
 
   it("puebla req.auth con los claims cuando el token es valido, y llama a next", () => {
-    const token = jwt.sign({ sub: "1", uid: 1, roles: ["ADMINISTRACION"] }, config.jwtSecret, { algorithm: "HS256" });
+    const token = encryptNestedJwt(
+      jwt.sign({ sub: "1", uid: 1, roles: ["ADMINISTRACION"] }, config.jwtSecret, { algorithm: "HS256" }),
+      config.jwtEncryptionKey,
+    );
     const req = mockRequest({ access_token: token });
     const next = vi.fn();
 
