@@ -65,9 +65,11 @@ jobs:
         env:
           CI_JWT_SECRET: ${{ secrets.CI_JWT_SECRET }}
         run: |
+          JWT_ENCRYPTION_KEY=$(openssl rand -base64 32 | tr '+/' '-_' | tr -d '=')
           docker run -d --name app-smoke \
             --network host \
             -e JWT_SECRET="$CI_JWT_SECRET" \
+            -e JWT_ENCRYPTION_KEY="$JWT_ENCRYPTION_KEY" \
             -e REDIS_URL=redis://localhost:6379 \
             -e USER_SERVICE_URL=http://localhost:8080 \
             -e WALL_SERVICE_URL=http://localhost:4100 \

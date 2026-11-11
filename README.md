@@ -22,7 +22,7 @@ no reemplaza esa validacion.
 - Node 24, TypeScript, Express 5
 - pnpm
 - `tsx` para desarrollo, `tsc` para build de produccion
-- `http-proxy-middleware` para el reverse proxy hacia cada microservicio
+- `http-proxy-middleware` para el reverse proxy HTTP y WebSocket hacia cada microservicio
 
 ## Estructura
 
@@ -82,20 +82,23 @@ Interfaces publicadas en local:
 | `gr-billing-ui` | 3007 |
 
 Las URLs de los frontends se resuelven desde el navegador mediante `localhost`; dentro de los contenedores, las
-peticiones al backend usan el nombre del servicio `gateway` en la red de Compose.
+peticiones al backend usan el nombre del servicio `gateway` en la red de Compose. El gateway también reenvía el
+upgrade WebSocket de `/api/v1/publicaciones/eventos/ws` hacia `gr-wall-microservice`.
 
 ## Variables de entorno
 
 `CONTACT_SERVICE_URL` (por defecto `http://localhost:4500`) y `BILLING_SERVICE_URL` (por defecto `http://localhost:4400`) apuntan a los servicios nuevos. El gateway permite anónimamente únicamente `POST /api/v1/contacto/solicitudes`; las demás rutas de contacto y todas las financieras requieren sesión.
 
 Ver `.env.example`. `JWT_SECRET` debe ser exactamente el mismo secreto configurado en `gr-user-microservice`
-(variable `JWT_SECRET` alla tambien), de al menos 32 caracteres.
+(variable `JWT_SECRET` alla tambien), de al menos 32 caracteres. `JWT_ENCRYPTION_KEY` tambien debe coincidir: el
+access token es un JWS cifrado como JWE (`dir` + `A256GCM`), y el gateway lo descifra (`src/lib/jwe.ts`) antes de
+verificar la firma. Un JWT plano se rechaza.
 
 ## Desarrollo
 
 ```bash
 pnpm install
-cp .env.example .env   # completar JWT_SECRET con el mismo valor que el backend
+cp .env.example .env   # completar JWT_SECRET y JWT_ENCRYPTION_KEY con los mismos valores que el backend
 pnpm dev
 ```
 
