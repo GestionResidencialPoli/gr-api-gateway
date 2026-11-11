@@ -3,6 +3,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import request from "supertest";
 import jwt from "jsonwebtoken";
+import { encryptNestedJwt } from "../lib/jwe";
 import config from "../config";
 
 vi.mock("../middlewares/rate-limiter", () => ({
@@ -33,7 +34,10 @@ function buildApp() {
 }
 
 function signToken(roles: string[] = ["RESIDENTE"]) {
-  return jwt.sign({ sub: "1", uid: 1, roles }, config.jwtSecret, { algorithm: "HS256" });
+  return encryptNestedJwt(
+    jwt.sign({ sub: "1", uid: 1, roles }, config.jwtSecret, { algorithm: "HS256" }),
+    config.jwtEncryptionKey,
+  );
 }
 
 describe("gatewayRouter", () => {
