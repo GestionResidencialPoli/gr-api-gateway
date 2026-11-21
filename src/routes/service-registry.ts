@@ -24,7 +24,7 @@ const serviceRegistry: ServiceRoute[] = [
   },
   {
     name: "wall-microservice",
-    pathPrefixes: ["/api/v1/publicaciones"],
+    pathPrefixes: ["/api/v1/publicaciones", "/graphql"],
     target: config.wallServiceUrl,
     publicPaths: [],
   },
