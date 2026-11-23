@@ -20,10 +20,13 @@ class Server {
     this.app = express();
     this.httpServer = http.createServer(this.app);
     this.setup();
-    const wallService = serviceRegistry.find((service) => service.name === "wall-microservice");
-    if (wallService) {
-      attachWebSocketProxy(this.httpServer, wallService, "/api/v1/publicaciones/eventos/ws");
-    }
+    this.attachWebSocket("wall-microservice", "/api/v1/publicaciones/eventos/ws");
+    this.attachWebSocket("notification-microservice", "/api/v1/notificaciones/ws");
+  }
+
+  private attachWebSocket(serviceName: string, path: string): void {
+    const service = serviceRegistry.find(({ name }) => name === serviceName);
+    if (service) attachWebSocketProxy(this.httpServer, service, path);
   }
 
   private setup(): void {
