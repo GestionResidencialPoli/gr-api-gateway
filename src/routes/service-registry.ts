@@ -52,6 +52,12 @@ const serviceRegistry: ServiceRoute[] = [
     target: config.billingServiceUrl,
     publicPaths: [],
   },
+  {
+    name: "notification-microservice",
+    pathPrefixes: ["/api/v1/notificaciones"],
+    target: config.notificationServiceUrl,
+    publicPaths: [],
+  },
 ];
 
 export default serviceRegistry;

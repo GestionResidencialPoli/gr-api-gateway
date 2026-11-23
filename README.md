@@ -55,6 +55,7 @@ Servicios registrados hoy:
 | gr-wall-microservice | `/api/v1/publicaciones` | `WALL_SERVICE_URL` | 4100 |
 | gr-booking-microservice | `/api/v1/zonas-comunes`, `/api/v1/reservas` | `BOOKING_SERVICE_URL` | 4200 |
 | gr-gate-microservice | `/api/v1/porteria` | `GATE_SERVICE_URL` | 4300 |
+| gr-notification-microservice | `/api/v1/notificaciones` | `NOTIFICATION_SERVICE_URL` | 4600 |
 
 El stack completo (incluidas las migraciones de cada servicio Node, que crean su propia base — `gr_wall_db`,
 `gr_booking_db`, `gr_gate_db` — en el mismo Postgres) se levanta desde `gr-infra`, no desde este repo.
