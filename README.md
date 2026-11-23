@@ -52,7 +52,7 @@ Servicios registrados hoy:
 | Servicio | Prefijos | Variable del destino | Puerto local |
 |---|---|---|---|
 | gr-user-microservice | `/api/v1/auth`, `/api/v1/apartamentos`, `/api/v1/vigilantes` | `USER_SERVICE_URL` | 8080 |
-| gr-wall-microservice | `/api/v1/publicaciones` | `WALL_SERVICE_URL` | 4100 |
+| gr-wall-microservice | `/api/v1/publicaciones`, `/graphql` | `WALL_SERVICE_URL` | 4100 |
 | gr-booking-microservice | `/api/v1/zonas-comunes`, `/api/v1/reservas` | `BOOKING_SERVICE_URL` | 4200 |
 | gr-gate-microservice | `/api/v1/porteria` | `GATE_SERVICE_URL` | 4300 |
 
@@ -84,6 +84,7 @@ Interfaces publicadas en local:
 Las URLs de los frontends se resuelven desde el navegador mediante `localhost`; dentro de los contenedores, las
 peticiones al backend usan el nombre del servicio `gateway` en la red de Compose. El gateway también reenvía el
 upgrade WebSocket de `/api/v1/publicaciones/eventos/ws` hacia `gr-wall-microservice`.
+Tambien reenvia `POST /graphql` hacia el mismo microservicio, aplicando primero la autenticacion local del gateway.
 
 ## Variables de entorno
 
