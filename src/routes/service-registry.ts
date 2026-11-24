@@ -24,7 +24,7 @@ const serviceRegistry: ServiceRoute[] = [
   },
   {
     name: "wall-microservice",
-    pathPrefixes: ["/api/v1/publicaciones"],
+    pathPrefixes: ["/api/v1/publicaciones", "/graphql"],
     target: config.wallServiceUrl,
     publicPaths: [],
   },
@@ -50,6 +50,12 @@ const serviceRegistry: ServiceRoute[] = [
     name: "billing-microservice",
     pathPrefixes: ["/api/v1/finanzas"],
     target: config.billingServiceUrl,
+    publicPaths: [],
+  },
+  {
+    name: "notification-microservice",
+    pathPrefixes: ["/api/v1/notificaciones"],
+    target: config.notificationServiceUrl,
     publicPaths: [],
   },
 ];
